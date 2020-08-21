@@ -22,25 +22,21 @@ from utils import consts as consts
 class ZerodhaConnect:
 	def __init__(self):
 		self.__kc_client = None
+		self.__access_token = None
 
 	@property
 	def kc_client(self):
-		try:
-			if not self.__kc_client:
-				kite_client = KiteConnect(api_key=creds.API_KEY)
-				request_token = self.get_request_token(login_url=(kite_client.login_url()))
-				data = kite_client.generate_session(request_token=request_token, api_secret=creds.API_SECRET)
-				access_token = data.get("access_token", None)
-				if not access_token:
+		if not self.__kc_client:
+			try:
+				if not self.access_token:
 					print("Error in retrieving access token")
-					return self.__kc_client
-				kite_client.set_access_token(access_token)
+					raise Exception("Cannot create kite session as no access token is availble.")
+				kite_client = KiteConnect(api_key=creds.API_KEY)
+				kite_client.set_access_token(self.access_token)
 				self.__kc_client = kite_client
-				return self.__kc_client
-		except Exception as e:
-			print("Error in creating kite client.")
-			return None
-
+			except Exception as e:
+				print("Error in creating kite client.")
+		return self.__kc_client
 
 	def get_request_token(self, login_url):
 		try:
@@ -70,6 +66,23 @@ class ZerodhaConnect:
 			print("Error in getting request Token")
 		finally:
 			driver.quit()
+
+	# - TODO -1- for later save the access token to a file and pick it from there and check if it is active or
+	#    expired and based on that generate new access token
+	@property
+	def access_token(self):
+		if not self.__access_token:
+			try:
+				kite_client = KiteConnect(api_key=creds.API_KEY)
+				request_token = self.get_request_token(login_url=(kite_client.login_url()))
+				data = kite_client.generate_session(request_token=request_token, api_secret=creds.API_SECRET)
+				access_token = data.get("access_token", None)
+				if not access_token:
+					print("No key available in session as access token. sending as None.")
+				self.__access_token = access_token
+			except Exception as e:
+				print("Error in fetching acess token.")
+		return self.__access_token
 
 
 
