@@ -1,16 +1,16 @@
 """
-Copywrite Opia Technologies Pvt Limited 2020
-@author Yakshit Philip
+Copyright Opia Technologies Pvt Limited 2020
+@author
+	Name : Yakshit Philip
+	Email : yakshit.philip@gmail.com
 Class to test manual Connection to zerodha Kite connect API
 """
+
 # Python Internal Packages
-import os
 import time
 
-
-#Third Party Dependencies
+# Third Party Dependencies
 from kiteconnect import KiteConnect
-import pandas as pd
 from selenium import webdriver
 
 # Package Dependency
@@ -30,12 +30,12 @@ class ZerodhaConnect:
 			try:
 				if not self.access_token:
 					print("Error in retrieving access token")
-					raise Exception("Cannot create kite session as no access token is availble.")
+					raise Exception("Cannot create kite session as no access token is available.")
 				kite_client = KiteConnect(api_key=creds.API_KEY)
 				kite_client.set_access_token(self.access_token)
 				self.__kc_client = kite_client
 			except Exception as e:
-				print("Error in creating kite client.")
+				print("Error in creating kite client with error %s." % str(e))
 		return self.__kc_client
 
 	def get_request_token(self, login_url):
@@ -65,7 +65,7 @@ class ZerodhaConnect:
 			else:
 				raise Exception("Couldn't Login - please try again.")
 		except Exception as e:
-			print("Error in getting request Token")
+			print("Error in getting request Token with error %s." % str(e))
 		finally:
 			if initialization_of_driver_successful:
 				driver.quit()
@@ -84,7 +84,7 @@ class ZerodhaConnect:
 					print("No key available in session as access token. sending as None.")
 				self.__access_token = access_token
 			except Exception as e:
-				print("Error in fetching acess token.")
+				print("Error in fetching access token with error %s." % str(e))
 		return self.__access_token
 
 	def renew_kite_connection(self):
@@ -96,6 +96,3 @@ class ZerodhaConnect:
 		self.__kc_client = None
 		self.__access_token = None
 		return self.kc_client
-
-
-

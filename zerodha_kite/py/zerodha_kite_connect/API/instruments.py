@@ -46,16 +46,16 @@ class Instruments(BASEAPI):
 				print(traceback.format_exc())
 		return self.__instruments_df
 
-	def store_instruments_of_exchange_as_csv(self, exchange):
+	def store_instruments_of_exchange_as_csv(self):
 		try:
 			instruments_df = self.instruments_of_exchange_as_dataframe
 			today = date.today()
 			date_today = today.strftime("%b-%d-%Y")
-			path_of_csv = "%s_Instruments_%s" % (exchange, str(date_today))
+			path_of_csv = "%s_Instruments_%s" % (self.__exchange, str(date_today))
 			instruments_df.to_csv(path_of_csv, index=False)
 			return True
 		except Exception as e:
-			print("Error in storing instruments for exchange : %s with error %s" % (exchange, str(e)))
+			print("Error in storing instruments for exchange : %s with error %s" % (self.__exchange, str(e)))
 			print(traceback.format_exc())
 			return False
 
@@ -63,24 +63,14 @@ class Instruments(BASEAPI):
 		# TODO -1- Implement to convert csv into dataframe based on the csv path.
 		pass
 
-	def get_instrument_for_symbol(self, exchange, symbol):
+	def get_instrument_for_symbol(self, symbol):
 		try:
 			instruments_df = self.instruments_of_exchange_as_dataframe
 			instrument_object = instruments_df[instruments_df.tradingsymbol == symbol]
 			instrument_token = instrument_object.instrument_token.values[0]
 			return instrument_token
 		except Exception as e:
-			print(f"Error in getting instrument token for symbol on exchange: {symbol} {exchange} with error {str(e)}")
+			print(f"Error in getting instrument token for symbol: {symbol} with error {str(e)}")
 			print(traceback.format_exc())
 			return -1
 
-	def get_instrument_for_symbol_from_loaded_df(self, symbol):
-		try:
-			instrument_object = \
-				self.instruments_of_exchange_as_dataframe[self.instruments_of_exchange_as_dataframe.tradingsymbol == symbol]
-			instrument_token = instrument_object.instrument_token.values[0]
-			return instrument_token
-		except Exception as e:
-			print("Error in getting instrument token for symbol: %s with error %s" % (symbol, str(e)))
-			print(traceback.format_exc())
-			return -1
