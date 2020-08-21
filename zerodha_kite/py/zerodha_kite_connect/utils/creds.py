@@ -1,0 +1,12 @@
+from json import loads
+import os
+
+CONFIG_PATH = "../../../config/config.json"
+CONFIG = loads(open(CONFIG_PATH, 'r').read())
+print(CONFIG)
+
+API_KEY = CONFIG.get("API_TOKEN")
+API_SECRET = CONFIG.get("API_SECRET_KEY")
+KITE_USER_ID = CONFIG.get("KITE_USER_ID")
+PASSWORD_ENCRYPTED = CONFIG.get("KITE_PASSWORD_ENCRYPTED")
+PIN_ENCRYPTED = CONFIG.get("KITE_PIN_ENCRYPTED")
