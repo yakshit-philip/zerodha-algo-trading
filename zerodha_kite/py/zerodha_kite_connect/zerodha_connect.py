@@ -39,6 +39,7 @@ class ZerodhaConnect:
 		return self.__kc_client
 
 	def get_request_token(self, login_url):
+		initialization_of_driver_successful = False
 		try:
 			service = webdriver.chrome.service.Service("../../../drivers/chromedriver")
 			service.start()
@@ -46,6 +47,7 @@ class ZerodhaConnect:
 			options.add_argument("--headless")
 			options.to_capabilities()
 			driver = webdriver.Remote(service.service_url, options)
+			initialization_of_driver_successful = True
 			driver.get(login_url)
 			driver.implicitly_wait(consts.WAIT_TIME)
 			username = driver.find_element_by_xpath(consts.USERNAME_XPATH)
@@ -65,7 +67,8 @@ class ZerodhaConnect:
 		except Exception as e:
 			print("Error in getting request Token")
 		finally:
-			driver.quit()
+			if initialization_of_driver_successful:
+				driver.quit()
 
 	# - TODO -1- for later save the access token to a file and pick it from there and check if it is active or
 	#    expired and based on that generate new access token
@@ -83,6 +86,16 @@ class ZerodhaConnect:
 			except Exception as e:
 				print("Error in fetching acess token.")
 		return self.__access_token
+
+	def renew_kite_connection(self):
+		"""
+		Function to renew kite connection in case of expiration of access token.
+		Returns:
+			kc_client : Kite Connection object
+		"""
+		self.__kc_client = None
+		self.__access_token = None
+		return self.kc_client
 
 
 
