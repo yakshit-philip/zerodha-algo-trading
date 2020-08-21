@@ -6,13 +6,12 @@ Author :
 	Email : yakshit.philip@gmail.com
 """
 
-# Package Dependencies
-from zerodha_connect import ZerodhaConnect
+#Package Dependency
+from zerodha_kite_connect.zerodha_connect import ZerodhaConnect
 
-
-class HistoricalData:
+class BASEAPI:
 	def __init__(self, kite_client=None):
-		self.__kc_client = kite_client
+		self.__kite_client = kite_client
 
 	@property
 	def kc_client(self):
@@ -21,5 +20,5 @@ class HistoricalData:
 				obj_zc = ZerodhaConnect()
 				self.__kc_client = obj_zc.kc_client
 			except Exception as e:
-				print("Error in creating kite connect Client.")
+				print("Error in creating kite connect Client with error %s." % str(e))
 		return self.__kc_client

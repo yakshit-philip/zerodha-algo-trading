@@ -14,9 +14,9 @@ import pandas as pd
 from selenium import webdriver
 
 # Package Dependency
-from utils.utils import decrypt
-from utils import creds as creds
-from utils import consts as consts
+from zerodha_kite_connect.utils.utils import decrypt
+from zerodha_kite_connect.utils import creds as creds
+from zerodha_kite_connect.utils import consts as consts
 
 
 class ZerodhaConnect:

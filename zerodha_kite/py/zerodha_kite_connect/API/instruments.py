@@ -14,45 +14,41 @@ import traceback
 from datetime import date
 
 # Package Dependencies
-from zerodha_connect import ZerodhaConnect
+from zerodha_kite_connect.API.base_api import BASEAPI
 
 
-class Instruments:
-	def __init__(self, kite_client=None):
-		self.__kc_client = kite_client
+class Instruments(BASEAPI):
+	def __init__(self, exchange, kite_client=None):
+		super().__init__(kite_client)
+		self.__exchange = exchange
+		self.__instruments = None
+		self.__instruments_df = None
 
 	@property
-	def kc_client(self):
-		if not self.__kc_client:
+	def instruments_of_exchange(self):
+		if not self.__instruments:
 			try:
-				obj_zc = ZerodhaConnect()
-				self.__kc_client = obj_zc.kc_client
+				instruments = self.kc_client.instruments(self.__exchange)
+				self.__instruments = instruments
 			except Exception as e:
-				print("Error in creating kite connect Client with error %s." % str(e))
-		return self.__kc_client
+				print("Error in getting instruments for exchange : %s with error %s" % (self.__exchange, str(e)))
+				print(traceback.format_exc())
+		return self.__instruments
 
-	def get_instruments_of_exchange(self, exchange):
-		try:
-			instruments = self.kc_client.instruments(exchange)
-			return instruments
-		except Exception as e:
-			print("Error in getting instruments for exchange : %s with error %s" % (exchange, str(e)))
-			print(traceback.format_exc())
-			return None
-
-	def get_instruments_of_exchange_as_dataframe(self, exchange):
-		try:
-			instruments = self.kc_client.instruments(exchange)
-			instruments_dataframe = pd.DataFrame(instruments)
-			return instruments_dataframe
-		except Exception as e:
-			print("Error in getting instruments for exchange : %s with error %s" % (exchange, str(e)))
-			print(traceback.format_exc())
-			return None
+	@property
+	def instruments_of_exchange_as_dataframe(self):
+		if not self.__instruments_df:
+			try:
+				instruments_dataframe = pd.DataFrame(self.instruments_of_exchange)
+				self.__instruments_df = instruments_dataframe
+			except Exception as e:
+				print("Error in getting instruments for exchange : %s with error %s" % (self.__exchange, str(e)))
+				print(traceback.format_exc())
+		return self.__instruments_df
 
 	def store_instruments_of_exchange_as_csv(self, exchange):
 		try:
-			instruments_df = self.get_instruments_of_exchange_as_dataframe(exchange)
+			instruments_df = self.instruments_of_exchange_as_dataframe
 			today = date.today()
 			date_today = today.strftime("%b-%d-%Y")
 			path_of_csv = "%s_Instruments_%s" % (exchange, str(date_today))
@@ -69,7 +65,7 @@ class Instruments:
 
 	def get_instrument_for_symbol(self, exchange, symbol):
 		try:
-			instruments_df = self.get_instruments_of_exchange_as_dataframe(exchange)
+			instruments_df = self.instruments_of_exchange_as_dataframe
 			instrument_object = instruments_df[instruments_df.tradingsymbol == symbol]
 			instrument_token = instrument_object.instrument_token.values[0]
 			return instrument_token
@@ -78,10 +74,10 @@ class Instruments:
 			print(traceback.format_exc())
 			return -1
 
-	@staticmethod
-	def get_instrument_for_symbol_from_loaded_df(instruments_df, symbol):
+	def get_instrument_for_symbol_from_loaded_df(self, symbol):
 		try:
-			instrument_object = instruments_df[instruments_df.tradingsymbol == symbol]
+			instrument_object = \
+				self.instruments_of_exchange_as_dataframe[self.instruments_of_exchange_as_dataframe.tradingsymbol == symbol]
 			instrument_token = instrument_object.instrument_token.values[0]
 			return instrument_token
 		except Exception as e:
