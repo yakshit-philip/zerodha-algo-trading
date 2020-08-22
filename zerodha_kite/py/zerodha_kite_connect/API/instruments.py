@@ -74,3 +74,17 @@ class Instruments(BASEAPI):
 			print(traceback.format_exc())
 			return -1
 
+	def get_instruments_for_symbols(self, symbol_list):
+		instrument_token_dict = dict()
+		try:
+			instruments_df = self.instruments_of_exchange_as_dataframe
+			for symbol in symbol_list:
+				instrument_object = instruments_df[instruments_df.tradingsymbol == symbol]
+				instrument_token = instrument_object.instrument_token.values[0]
+				instrument_token_dict[symbol] = int(instrument_token)
+		except Exception as e:
+			print("Error in instruments token for the given symbols with error : %s" % str(e))
+			print(traceback.format_exc())
+		return instrument_token_dict
+
+

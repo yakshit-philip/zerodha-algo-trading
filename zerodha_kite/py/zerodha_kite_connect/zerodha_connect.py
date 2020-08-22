@@ -8,9 +8,10 @@ Class to test manual Connection to zerodha Kite connect API
 
 # Python Internal Packages
 import time
+import traceback
 
 # Third Party Dependencies
-from kiteconnect import KiteConnect
+from kiteconnect import KiteConnect , KiteTicker
 from selenium import webdriver
 
 # Package Dependency
@@ -22,6 +23,7 @@ from zerodha_kite_connect.utils import consts as consts
 class ZerodhaConnect:
 	def __init__(self):
 		self.__kc_client = None
+		self.__kt_client = None
 		self.__access_token = None
 
 	@property
@@ -37,6 +39,21 @@ class ZerodhaConnect:
 			except Exception as e:
 				print("Error in creating kite client with error %s." % str(e))
 		return self.__kc_client
+
+	@property
+	def kite_ticker_client(self):
+		if not self.__kt_client:
+			try:
+				if not self.access_token:
+					print("Error in retrieving access token")
+					raise Exception("Cannot create kite ticket object as no access token is available.")
+				kite_ticker = KiteTicker(creds.API_KEY, access_token=self.access_token)
+				self.__kt_client = kite_ticker
+			except Exception as e:
+				print("Error in getting kite Ticker Object : %s" % str(e))
+				print(traceback.format_exc())
+		return self.__kt_client
+
 
 	def get_request_token(self, login_url):
 		initialization_of_driver_successful = False
