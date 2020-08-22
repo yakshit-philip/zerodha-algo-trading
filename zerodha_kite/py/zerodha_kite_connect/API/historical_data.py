@@ -52,7 +52,7 @@ class HistoricalData(BASEAPI):
 	@property
 	def OCHLV_dataframe(self):
 		try:
-			instrument_token = self.__instrument_obj.get_instrument_for_symbol_from_loaded_df(self.__symbol)
+			instrument_token = self.__instrument_obj.get_instrument_for_symbol(self.__symbol)
 			historical_data = self.kc_client.historical_data(instrument_token,date.today()-timedelta(self.__duration),
 																											 date.today(),self.__interval)
 			historical_data_df = pd.DataFrame(historical_data)
